@@ -1,9 +1,8 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import String
 from typing import Optional
-from sqlalchemy.orm import Session
 
-from .base import Base, engine
+from .base import Base, SessionLocal
 
 class Student(Base):
     __tablename__ = "students"
@@ -16,24 +15,33 @@ class Student(Base):
 
     def __repr__(self):
         return f"Student(id={self.id}, name={self.name}, age={self.age}, gender={self.gender}, email={self.email})"
+    
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "age": self.age,
+            "gender": self.gender,
+            "email": self.email
+        }
 
     @classmethod
     def with_name(cls, name: str):
-        with Session(engine) as session:
+        with SessionLocal() as session:
             return session.query(cls).filter_by(name=name).first()
 
     @classmethod
     def with_id(cls, student_id: int):
-        with Session(engine) as session:
+        with SessionLocal() as session:
             # Use the session to query the database
             return session.query(cls).filter_by(id=student_id).first()
 
     @classmethod
     def with_email(cls, email: str):
-        with Session(engine) as session:
+        with SessionLocal() as session:
             return session.query(cls).filter_by(email=email).first()
 
     @classmethod
     def all_students(cls):
-        with Session(engine) as session:
+        with SessionLocal() as session:
             return session.query(cls).all()

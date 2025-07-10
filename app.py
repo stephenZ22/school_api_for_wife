@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 # from openpyxl import Workbook, load_workbook
 from db import init_db,creat_data, query_db
 from models.students import Student
+from models.teachers import Teacher
 
 app = Flask(__name__)
 
@@ -70,12 +71,7 @@ def get_all_students():
     print(students)
     results = []
     for student in students:
-        results.append({
-            "id": student.id,
-            "name": student.name,
-            "age": student.age,
-            "gender": student.gender
-        })
+        results.append(student.to_dict())
     return jsonify({
         "message": "ok",
         "code": 200,
@@ -96,13 +92,7 @@ def get_student_by_name(name):
     return jsonify({
         "message": "ok",
         "code": 200,
-        "data": {
-            "id": student.id,
-            "name": student.name,
-            "age": student.age,
-            "gender": student.gender,
-            "email": student.email
-        }
+        "data": student.to_dict()
     }), 200
 
 @app.route('/api/student/<int:student_id>', methods=['GET'])
@@ -119,13 +109,7 @@ def get_student_by_id(student_id):
     return jsonify({
         "message": "ok",
         "code": 200,
-        "data": {
-            "id": student.id,
-            "name": student.name,
-            "age": student.age,
-            "gender": student.gender,
-            "email": student.email
-        }
+        "data": student.to_dict()
     }), 200
 
 @app.route('/api/student/with_email', methods=['GET'])
@@ -143,13 +127,7 @@ def get_student_by_email():
     return jsonify({
         "message": "ok",
         "code": 200,
-        "data": {
-            "id": student.id,
-            "name": student.name,
-            "age": student.age,
-            "gender": student.gender,
-            "email": student.email
-        }
+        "data": student.to_dict()
     }), 200
 
 @app.route('/api/teacher', methods=['POST'])
@@ -158,7 +136,9 @@ def create_teacher():
     name = data.get('name')
     age = data.get('age')
     gender = data.get('gender')
-    
+    email = data.get('email', '')  # 可选字段，默认为空字符串
+
+    Teacher.create_teacher(name=name, age=age, email=email, gender=gender)
     # 模拟保存或处理逻辑
     return jsonify({
         "message": "ok",
